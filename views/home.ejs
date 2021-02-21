@@ -1,0 +1,12 @@
+<%- include('./partials/header'); %>
+<h1>Home</h1>
+<p>
+  <%= permaText %>
+  </p>
+<% for (let i = 0; i<homeText.length ; i++){ %>
+<h1> <%= homeText[i].title%></h1>
+<p> <%= homeText[i].content.substring(0,100) + "...." %>
+<a href="/posts/<%=  homeText[i].title %>">Read More</a>
+</p>
+<% }%>
+<%- include('./partials/footer'); %>
