@@ -3,6 +3,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
+const mongoose = require("mongoose");
 var posts = [];
 const _ = require('lodash');
 const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
@@ -17,10 +18,24 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static("public"));
 
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useUnifiedTopology', true);
+mongoose.connect("mongodb://localhost:27017/blogDB");
+
+const postSchema = new mongoose.Schema({
+  Title: String,
+  Post: String
+});
+
+const Post = mongoose.model("Post", postSchema);
 
 app.get("/", function(req, res) {
-  res.render("home", {
-    homeText: posts, permaText:homeStartingContent
+
+  Post.find({}, function(err, posts) {
+    res.render("home", {
+      homeText: posts,
+      permaText: homeStartingContent
+    });
   });
 });
 
@@ -39,30 +54,30 @@ app.get("/compose", function(req, res) {
   res.render("compose");
 });
 app.post("/compose", function(req, res) {
-  const post = {
-    title: req.body.titleText,
-    content: req.body.postText
-  };
-  posts.push(post);
+  const post = new Post({
+    Title: req.body.titleText,
+    Post: req.body.postText
+  });
+  post.save();
   res.redirect("/");
 
 });
 
-app.get('/posts/:postName', function (req, res) {
-const titleInput =  _.lowerCase( req.params.postName);
+app.get('/posts/:postName', function(req, res) {
+  const titleInput = _.lowerCase(req.params.postName);
 
-posts.forEach(function(post){
-const storedTitle = _.lowerCase(post.title);
+  posts.forEach(function(post) {
+    const storedTitle = _.lowerCase(post.title);
 
-if (titleInput === storedTitle){
-  res.render("post", {
-    myPost: post
+    if (titleInput === storedTitle) {
+      res.render("post", {
+        myPost: post
+      });
+    }
+
   });
-}
-
-});
 });
 
-app.listen(process.env.PORT||3000, function() {
+app.listen(process.env.PORT || 3000, function() {
   console.log("Server started on port 3000");
 });
