@@ -58,26 +58,33 @@ app.post("/compose", function(req, res) {
     Title: req.body.titleText,
     Post: req.body.postText
   });
-  post.save();
-  res.redirect("/");
+  post.save(function(err){
+
+     if (!err){
+
+       res.redirect("/");
+
+     }
+
+   });
+
+
 
 });
 
-app.get('/posts/:postName', function(req, res) {
-  const titleInput = _.lowerCase(req.params.postName);
 
-  posts.forEach(function(post) {
-    const storedTitle = _.lowerCase(post.title);
+app.get("/posts/:postId", function(req, res){
 
-    if (titleInput === storedTitle) {
-      res.render("post", {
-        myPost: post
-      });
-    }
+const requestedPostId = req.params.postId;
 
+  Post.findOne({_id: requestedPostId}, function(err, post){
+    res.render("post", {
+      title: post.Title,
+      content: post.Post
+    });
   });
-});
 
+});
 app.listen(process.env.PORT || 3000, function() {
   console.log("Server started on port 3000");
 });
