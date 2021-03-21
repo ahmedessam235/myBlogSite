@@ -20,7 +20,7 @@ app.use(express.static("public"));
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useUnifiedTopology', true);
-mongoose.connect("mongodb://localhost:27017/blogDB");
+mongoose.connect("mongodb+srv://ahmed:ahmed235@cluster0.b52dm.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
 
 const postSchema = new mongoose.Schema({
   Title: String,
